@@ -5,7 +5,5 @@ folium
 streamlit_folium
 geopandas
 dropbox
-io
-os
 requests
 tempfile
