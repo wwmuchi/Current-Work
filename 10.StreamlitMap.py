@@ -145,13 +145,19 @@ def list_files_in_dropbox(folder_path):
         return []
 
 # Function to download a file from Dropbox
-def download_from_dropbox(file_path, local_path):
+def download_and_decompress_from_dropbox(file_path, local_path):
     try:
         metadata, res = dbx.files_download(path=file_path)
-        with open(local_path, "wb") as f:
+        with open(local_path + ".gz", "wb") as f:
             f.write(res.content)
+
+        # Decompress the file
+        import gzip
+        with gzip.open(local_path + ".gz", "rb") as gz_file:
+            with open(local_path, "wb") as decompressed_file:
+                decompressed_file.write(gz_file.read())
     except Exception as e:
-        raise Exception(f"Failed to download file: {str(e)}")
+        raise Exception(f"Failed to download or decompress file: {str(e)}")
 
 # Update paths for Dropbox
 dropbox_map_path = f"{DROPBOX_FOLDER_PATH}/{map_name}"
@@ -168,7 +174,7 @@ if st.button("Load Map"):
                 st.error(f"Map file '{map_name}' not found in Dropbox.")
             else:
                 # Download file from Dropbox
-                download_from_dropbox(dropbox_map_path, local_map_path)
+                download_and_decompress_from_dropbox(dropbox_map_path, local_map_path)
                 st.session_state['map_loaded'] = True
         except Exception as e:
             st.error(f"Failed to load map: {str(e)}")
