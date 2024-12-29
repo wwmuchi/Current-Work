@@ -126,89 +126,91 @@ if st.button("Load Map"):
 
     if 'DROPBOX_ACCESS_TOKEN' not in st.session_state:
         st.session_state['DROPBOX_ACCESS_TOKEN'] = st.text_input("Enter Dropbox Access Token", type="password")
+        st.stop()
 
-    if st.session_state['DROPBOX_ACCESS_TOKEN']:
+    else:
         DROPBOX_ACCESS_TOKEN = st.session_state['DROPBOX_ACCESS_TOKEN']
-        with st.spinner("Downloading and loading map..."):
 
-            ######### Identify the map file
+    with st.spinner("Downloading and loading map..."):
 
-            # Generate file name for the map
-            hh_definition_joined = '_'.join(hh_definition) if hh_definition else "None"
-            map_name = f"{geography_data_type}_{exposure_data_type}_{hh_definition_joined}_{tract_data_options['agg_type']}_{tract_data_options['weight']}.html"
+        ######### Identify the map file
 
-            # Dropbox API access token
-            dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
+        # Generate file name for the map
+        hh_definition_joined = '_'.join(hh_definition) if hh_definition else "None"
+        map_name = f"{geography_data_type}_{exposure_data_type}_{hh_definition_joined}_{tract_data_options['agg_type']}_{tract_data_options['weight']}.html"
 
-            # Corrected folder path in Dropbox
-            DROPBOX_FOLDER_PATH = "/jamie foxx/Will Moller Work/Data/Current Work/Exports/Maps"
+        # Dropbox API access token
+        dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
 
-            # Function to list files in the Dropbox folder
-            def list_files_in_dropbox(folder_path):
-                try:
-                    entries = dbx.files_list_folder(folder_path).entries
-                    return [entry.name for entry in entries if isinstance(entry, dropbox.files.FileMetadata)]
-                except dropbox.exceptions.ApiError as e:
-                    st.error(f"Failed to list files in Dropbox folder: {str(e)}")
-                    return []
+        # Corrected folder path in Dropbox
+        DROPBOX_FOLDER_PATH = "/jamie foxx/Will Moller Work/Data/Current Work/Exports/Maps"
 
-            # Function to download a file from Dropbox
-            def download_from_dropbox(file_path, local_path):
-                try:
-                    metadata, res = dbx.files_download(path=file_path)
-                    with open(local_path, "wb") as f:
-                        f.write(res.content)
-                except Exception as e:
-                    raise Exception(f"Failed to download file: {str(e)}")
-
-            # Update paths for Dropbox
-            dropbox_map_path = f"{DROPBOX_FOLDER_PATH}/{map_name}"
-            local_map_path = tempfile.NamedTemporaryFile(delete=False, suffix=".html").name
-
-            ######### Load Map
+        # Function to list files in the Dropbox folder
+        def list_files_in_dropbox(folder_path):
             try:
-                # List available files in Dropbox folder
-                available_files = list_files_in_dropbox(DROPBOX_FOLDER_PATH)
+                entries = dbx.files_list_folder(folder_path).entries
+                return [entry.name for entry in entries if isinstance(entry, dropbox.files.FileMetadata)]
+            except dropbox.exceptions.ApiError as e:
+                st.error(f"Failed to list files in Dropbox folder: {str(e)}")
+                return []
 
-                if map_name not in available_files:
-                    st.error(f"Map file '{map_name}' not found in Dropbox.")
-                else:
-                    # Download file from Dropbox
-                    download_from_dropbox(dropbox_map_path, local_map_path)
-                    st.session_state['map_loaded'] = True
+        # Function to download a file from Dropbox
+        def download_from_dropbox(file_path, local_path):
+            try:
+                metadata, res = dbx.files_download(path=file_path)
+                with open(local_path, "wb") as f:
+                    f.write(res.content)
             except Exception as e:
-                st.error(f"Failed to load map: {str(e)}")
+                raise Exception(f"Failed to download file: {str(e)}")
 
-        # Display the map
-            if st.session_state['map_loaded']:
-                with st.spinner(f"Rendering map: {map_name}"):
-                    try:
-                        with open(local_map_path, 'r', encoding='utf-8') as file:
-                            map_html = file.read()
-                        st.components.v1.html(map_html, height=600, scrolling=True)
+        # Update paths for Dropbox
+        dropbox_map_path = f"{DROPBOX_FOLDER_PATH}/{map_name}"
+        local_map_path = tempfile.NamedTemporaryFile(delete=False, suffix=".html").name
 
-                    except Exception as e:
-                        st.error(f"An error occurred while rendering the map: {str(e)}")    
+        ######### Load Map
+        try:
+            # List available files in Dropbox folder
+            available_files = list_files_in_dropbox(DROPBOX_FOLDER_PATH)
 
-                    # Add legend
-                    if exposure_data_type == '1997 Hip Hop Exposure':
-                        radio_legend_html = '''
-                        <div style="
-                            width: 100%;
-                            background-color: white;
-                            border: 2px solid black;
-                            padding: 10px;
-                            font-size: 14px;
-                            line-height: 1.5;
-                            text-align: left;
-                            margin-bottom: 5mm;
-                        ">
-                            <b>Legend</b><br>
-                            <b>1997 Hip Hop Exposure:</b><br>
-                            <i style="background: rgba(255, 0, 0, 1); width: 20px; height: 10px; display: inline-block;"></i> High Hip Hop Exposure (Reddish)<br>
-                            <i style="background: rgba(255, 0, 0, 0.5); width: 20px; height: 10px; display: inline-block;"></i> Moderate Hip Hop Exposure (Transparent Reddish)<br>
-                            <i style="background: rgba(255, 0, 0, 0); border: 1px solid black; width: 20px; height: 10px; display: inline-block;"></i> No Hip Hop Exposure (Transparent)<br>
-                        </div>
-                        '''
+            if map_name not in available_files:
+                st.error(f"Map file '{map_name}' not found in Dropbox.")
+            else:
+                # Download file from Dropbox
+                download_from_dropbox(dropbox_map_path, local_map_path)
+                st.session_state['map_loaded'] = True
+        except Exception as e:
+            st.error(f"Failed to load map: {str(e)}")
 
-                        st.markdown(radio_legend_html, unsafe_allow_html=True)
+    # Display the map
+        if st.session_state['map_loaded']:
+            with st.spinner(f"Rendering map: {map_name}"):
+                try:
+                    with open(local_map_path, 'r', encoding='utf-8') as file:
+                        map_html = file.read()
+                    st.components.v1.html(map_html, height=600, scrolling=True)
+
+                except Exception as e:
+                    st.error(f"An error occurred while rendering the map: {str(e)}")    
+
+                # Add legend
+                if exposure_data_type == '1997 Hip Hop Exposure':
+                    radio_legend_html = '''
+                    <div style="
+                        width: 100%;
+                        background-color: white;
+                        border: 2px solid black;
+                        padding: 10px;
+                        font-size: 14px;
+                        line-height: 1.5;
+                        text-align: left;
+                        margin-bottom: 5mm;
+                    ">
+                        <b>Legend</b><br>
+                        <b>1997 Hip Hop Exposure:</b><br>
+                        <i style="background: rgba(255, 0, 0, 1); width: 20px; height: 10px; display: inline-block;"></i> High Hip Hop Exposure (Reddish)<br>
+                        <i style="background: rgba(255, 0, 0, 0.5); width: 20px; height: 10px; display: inline-block;"></i> Moderate Hip Hop Exposure (Transparent Reddish)<br>
+                        <i style="background: rgba(255, 0, 0, 0); border: 1px solid black; width: 20px; height: 10px; display: inline-block;"></i> No Hip Hop Exposure (Transparent)<br>
+                    </div>
+                    '''
+
+                    st.markdown(radio_legend_html, unsafe_allow_html=True)
