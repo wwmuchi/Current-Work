@@ -124,9 +124,11 @@ else:
 
 if st.button("Load Map"):
 
-    DROPBOX_ACCESS_TOKEN = st.text_input("Enter Dropbox Access Token", type="password")
+    if 'DROPBOX_ACCESS_TOKEN' not in st.session_state:
+        st.session_state['DROPBOX_ACCESS_TOKEN'] = st.text_input("Enter Dropbox Access Token", type="password")
 
-    if DROPBOX_ACCESS_TOKEN:
+    if st.session_state['DROPBOX_ACCESS_TOKEN']:
+        DROPBOX_ACCESS_TOKEN = st.session_state['DROPBOX_ACCESS_TOKEN']
         with st.spinner("Downloading and loading map..."):
 
             ######### Identify the map file
