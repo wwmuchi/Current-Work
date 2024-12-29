@@ -125,46 +125,49 @@ else:
 st.markdown("Enter Dropbox Access Toke to view the map:")
 DROPBOX_ACCESS_TOKEN = st.text_input("Dropbox Access Token", type="password")
 
-######### Identify the map file
-
-# Generate file name for the map
-hh_definition_joined = '_'.join(hh_definition) if hh_definition else "None"
-map_name = f"{geography_data_type}_{exposure_data_type}_{hh_definition_joined}_{tract_data_options['agg_type']}_{tract_data_options['weight']}.html"
-
-# Dropbox API access token
-dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
-
-# Corrected folder path in Dropbox
-DROPBOX_FOLDER_PATH = "/jamie foxx/Will Moller Work/Data/Current Work/Exports/Maps"
-
-# Function to list files in the Dropbox folder
-def list_files_in_dropbox(folder_path):
-    try:
-        entries = dbx.files_list_folder(folder_path).entries
-        return [entry.name for entry in entries if isinstance(entry, dropbox.files.FileMetadata)]
-    except dropbox.exceptions.ApiError as e:
-        st.error(f"Failed to list files in Dropbox folder: {str(e)}")
-        return []
-
-# Function to download a file from Dropbox
-def download_from_dropbox(file_path, local_path):
-    try:
-        metadata, res = dbx.files_download(path=file_path)
-        with open(local_path, "wb") as f:
-            f.write(res.content)
-    except Exception as e:
-        raise Exception(f"Failed to download file: {str(e)}")
-
-# Update paths for Dropbox
-dropbox_map_path = f"{DROPBOX_FOLDER_PATH}/{map_name}"
-local_map_path = tempfile.NamedTemporaryFile(delete=False, suffix=".html").name
-
-######### Load Map
 if st.button("Load Map"):
+
     if not DROPBOX_ACCESS_TOKEN:
         st.error("Please enter a Dropbox Access Token to view the map.")
         st.stop()
+
     with st.spinner("Downloading and loading map..."):
+
+        ######### Identify the map file
+
+        # Generate file name for the map
+        hh_definition_joined = '_'.join(hh_definition) if hh_definition else "None"
+        map_name = f"{geography_data_type}_{exposure_data_type}_{hh_definition_joined}_{tract_data_options['agg_type']}_{tract_data_options['weight']}.html"
+
+        # Dropbox API access token
+        dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
+
+        # Corrected folder path in Dropbox
+        DROPBOX_FOLDER_PATH = "/jamie foxx/Will Moller Work/Data/Current Work/Exports/Maps"
+
+        # Function to list files in the Dropbox folder
+        def list_files_in_dropbox(folder_path):
+            try:
+                entries = dbx.files_list_folder(folder_path).entries
+                return [entry.name for entry in entries if isinstance(entry, dropbox.files.FileMetadata)]
+            except dropbox.exceptions.ApiError as e:
+                st.error(f"Failed to list files in Dropbox folder: {str(e)}")
+                return []
+
+        # Function to download a file from Dropbox
+        def download_from_dropbox(file_path, local_path):
+            try:
+                metadata, res = dbx.files_download(path=file_path)
+                with open(local_path, "wb") as f:
+                    f.write(res.content)
+            except Exception as e:
+                raise Exception(f"Failed to download file: {str(e)}")
+
+        # Update paths for Dropbox
+        dropbox_map_path = f"{DROPBOX_FOLDER_PATH}/{map_name}"
+        local_map_path = tempfile.NamedTemporaryFile(delete=False, suffix=".html").name
+
+######### Load Map
         try:
             # List available files in Dropbox folder
             available_files = list_files_in_dropbox(DROPBOX_FOLDER_PATH)
