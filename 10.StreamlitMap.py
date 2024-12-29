@@ -20,12 +20,6 @@ def reset_map():
 ######### User Interface
 st.title('Hip Hop Exposure Map')
 
-st.subheader("Enter Dropbox Access Token")
-DROPBOX_ACCESS_TOKEN = st.text_input("Dropbox Access Token", type="password")
-
-if not DROPBOX_ACCESS_TOKEN:
-    st.stop()
-
 st.subheader("Introduction:")
 
 st.markdown("""
@@ -127,6 +121,10 @@ else:
     tract_data_options['agg_type'] = 'Average'
     tract_data_options['weight'] = 'Non-Weighted'
 
+
+st.markdown("Enter Dropbox Access Toke to view the map:")
+DROPBOX_ACCESS_TOKEN = st.text_input("Dropbox Access Token", type="password")
+
 ######### Identify the map file
 
 # Generate file name for the map
@@ -163,6 +161,9 @@ local_map_path = tempfile.NamedTemporaryFile(delete=False, suffix=".html").name
 
 ######### Load Map
 if st.button("Load Map"):
+    if not DROPBOX_ACCESS_TOKEN:
+        st.error("Please enter a Dropbox Access Token to view the map.")
+        st.stop()
     with st.spinner("Downloading and loading map..."):
         try:
             # List available files in Dropbox folder
