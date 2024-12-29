@@ -9,7 +9,6 @@ import requests
 import tempfile
 import dropbox
 
-
 # Initialize session state to track if the map is loaded
 if 'map_loaded' not in st.session_state:
     st.session_state['map_loaded'] = False
@@ -20,6 +19,12 @@ def reset_map():
 
 ######### User Interface
 st.title('Hip Hop Exposure Map')
+
+st.subheader("Enter Dropbox Access Token")
+DROPBOX_ACCESS_TOKEN = st.text_input("Dropbox Access Token", type="password")
+
+if not DROPBOX_ACCESS_TOKEN:
+    st.stop()
 
 st.subheader("Introduction:")
 
@@ -129,7 +134,6 @@ hh_definition_joined = '_'.join(hh_definition) if hh_definition else "None"
 map_name = f"{geography_data_type}_{exposure_data_type}_{hh_definition_joined}_{tract_data_options['agg_type']}_{tract_data_options['weight']}.html"
 
 # Dropbox API access token
-DROPBOX_ACCESS_TOKEN = "sl.u.AFeQnCh3zIUtDAWHzBpb2fP_oVHyPedSDHv5mG_U3g-EELDAwPXLF8IHkvZ3wGRlPl1ZSGM93S93KXnLbvp4HBprrqYMfn2kYqyebNg6OXwEQamBWVT7CxDGzuAytyBFohd8e1cKFIblw-KYotm8--B1a8lnbTofgfZ3MgTcj_u_zYpNK541KaW0a9SPIIrHiuRKRYUUXHolJS7AGIhmMC6FyFBabwDWir30gRszKFmvebZJwXEW5N9-fGCDIPsgg8xNbrMo0yvyKqr1wjnCgjZhlJiYnjgXI5TaxOh8kO4SaHNydfsW5p4lt16f1EtP8G6hef8qnpZmqVnjEfebEbWYEa7lhCd9tdI0aWTWhVbczprSJhrn8-yF6OjNZ-C4kBOW16Ge5u7ULvPnE0YMv9EohAP8oUkmeA8jmunWy2cBAjh5-eLYyrocgy3H8daUgB1sgYXPjLIsNRgkqVBBzkPl5B48UwbcVyr-znC2VcXacZ-4qA_xJPL951E06JCoP4hCoItSsPHHUWHw7Ox1Xty_L3f0GsBEktkYV9Ie5dejavrcP1y0HMfI1qP3UhgAWaRR0I7tLPSwUm9Bt_uI-4yvuN-XiQ-2t7y8stwGYp2rHUGDSgXW-iLLG13sKBZs_889Zh5WlTVm620Ap_TNsl5QGAqqVHkVHct_u4SjecECsRf24i3sCu29D8rKPY1gLBA17mHoNTUGo8DDT-ikUyiO6E5lWxN2DwgdAWxSk_q47ojE33rzQnq3gJ61bjnSjwjr6S9iRihTyU97Pr8rjyAhT5FRfr8bhUEMmlJW6ptYP2te1QZ7ohJEAptmG8E5eqG3vmGqd76aNcKj1ldVYyo1w7_wc9J68bB_KtNg0G2_ArPIbMAMO8pyFZHlOQ8MwCTNyclXgtj39BYSh_MqLU-nDvZAqQ1ZYE2T7Z5pPtlv5x1-1dCSTgLFKRAA4IGeMIZHFF31jyrCrZuTYDdLzwykjGiAgvUiN2cAPJjiwJcwHq83uy2p85gIo-Ol7UXtyuLorpwQmfbzUi4wTKcaaIkd3mx8KBHhhIsPmPQVxSBwD2qJ3l2TW62hxPUXRWMYeJtK6lHk9Y1sZpFaEGQENTW7OzR7nzF2W4X0XEnYcpAMuvhewl8Dbkrx2dLKRZsNmGi2h4bVwq2g9YDKlpeqQXbF0ik5WZHGF1gU5Qfev4dIxX_XH8Q0Qvsnh4M2FVg9sxBCIG2eygaQ3kHVpe82e_2PJq394mrkQzVN3QBj_CAqM_GtGmYvcTVKmUL9iZRp0dAg6-KTG3OkFo3bJRsqtE_tZtsUxJZWu6_734GnefCWc_0Jj7s0YXyzxGJ0RFKW1YTmcrDnNfq9qEeFBOnizwAViAImqcG6-7yz_qm_zkIYAObX0kCiO0iXsnYER1jKFG-sycgxBIIELz-_1owb_-DwL9iQs1qvslJk2pCMLOwxzg"
 dbx = dropbox.Dropbox(DROPBOX_ACCESS_TOKEN)
 
 # Corrected folder path in Dropbox
