@@ -128,7 +128,7 @@ hh_definition_joined = '_'.join(hh_definition) if hh_definition else "None"
 map_name = f"{geography_data_type}_{exposure_data_type}_{hh_definition_joined}_{tract_data_options['agg_type']}_{tract_data_options['weight']}.html"
 
 # Dropbox API access token
-DROPBOX_ACCESS_TOKEN = st.secrets["dropbox_key"]
+DROPBOX_ACCESS_TOKEN = st.secrets["dropbox_key"]['key']
 st.write(DROPBOX_ACCESS_TOKEN)
 st.stop()
 
