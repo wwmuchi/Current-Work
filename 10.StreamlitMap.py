@@ -125,7 +125,8 @@ else:
 if st.button("Load Map"):
 
     if 'DROPBOX_ACCESS_TOKEN' not in st.session_state:
-        st.session_state['DROPBOX_ACCESS_TOKEN'] = st.text_input("Enter Dropbox Access Token", type="password")
+        DROPBOX_ACCESS_TOKEN = st.text_input("Enter Dropbox Access Token", type="password")
+        st.session_state['DROPBOX_ACCESS_TOKEN'] = DROPBOX_ACCESS_TOKEN
         st.stop()
 
     else:
