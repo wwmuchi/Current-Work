@@ -128,9 +128,9 @@ hh_definition_joined = '_'.join(hh_definition) if hh_definition else "None"
 map_name = f"{geography_data_type}_{exposure_data_type}_{hh_definition_joined}_{tract_data_options['agg_type']}_{tract_data_options['weight']}.html"
 
 # Access token setup
-APP_KEY = '1qu8aczan0edl2o'
+APP_KEY = st.secrets["dropbox_key"]['key']
 APP_SECRET = st.secrets["dropbox_secret"]['secret']
-REFRESH_TOKEN = "WVN_SXVS-9gAAAAAAAAAAfkpUHX7BZ3VC3cGoZzNXxML_nZ4Isu49TzWP4U1V6C3"
+REFRESH_TOKEN = st.secrets["dropbox_refresh_token"]['token']
 
 
 def get_access_token():
