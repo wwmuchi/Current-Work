@@ -8,6 +8,7 @@ import os
 import requests
 import tempfile
 import dropbox
+import json
 
 # Initialize session state to track if the map is loaded
 if 'map_loaded' not in st.session_state:
@@ -132,14 +133,22 @@ APP_KEY = st.secrets["dropbox_key"]['key']
 APP_SECRET = st.secrets["dropbox_secret"]['secret']
 REFRESH_TOKEN = st.secrets["dropbox_refresh_token"]['token']
 
+def retrieve_DBtoken(key, secret, refresh_token):
+    data = {
+        'refresh_token': refresh_token,
+        'grant_type': 'refresh_token',
+        'client_id': key,
+        'client_secret': secret,
+    }
+    response = requests.post('https://api.dropbox.com/oauth2/token', data = data)
+    response_data = json.loads(response.text)
+    access_token  = response_data["access_token"]
+    return access_token
 
-def get_access_token():
-    dbx = dropbox.DropboxOAuth2FlowNoRedirect(APP_KEY, APP_SECRET)
-    return dbx.refresh_access_token(REFRESH_TOKEN)
+atoken = retrieve_DBtoken(APP_KEY, APP_SECRET, REFRESH_TOKEN)
 
-# Use the token
-access_token = get_access_token()
-dbx = dropbox.Dropbox(access_token)
+# Loading a Dropbox client
+dbx = dropbox.Dropbox(atoken)
 
 # Corrected folder path in Dropbox
 DROPBOX_FOLDER_PATH = "/jamie foxx/Will Moller Work/Data/Current Work/Exports/Maps"
